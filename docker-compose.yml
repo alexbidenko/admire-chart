@@ -1,0 +1,12 @@
+version: '3.8'
+
+services:
+  admire_trello:
+    restart: always
+    container_name: admire_chart
+    build: .
+
+networks:
+  default:
+    external:
+      name: server

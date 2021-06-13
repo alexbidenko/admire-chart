@@ -1,0 +1,27 @@
+name: Build and Deploy
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-18.04
+    steps:
+      - name: Checkout 🛎
+        uses: actions/checkout@v2
+        with:
+          persist-credentials: false
+
+      - name: Install SSH key
+        run: |
+          mkdir -p ~/.ssh/
+          echo "${{ secrets.SSH_HOST }}" > ~/.ssh/known_hosts
+          echo -e 'Host *\n\tStrictHostKeyChecking no\n\n' > ~/.ssh/config
+          echo "${{ secrets.SSH_KEY }}" > ~/.ssh/id_rsa
+          chmod 400 ~/.ssh/id_rsa
+      - name: Deploy 🚀
+        run: docker-compose up --build -d
+        env:
+          DOCKER_HOST: ssh://${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}
